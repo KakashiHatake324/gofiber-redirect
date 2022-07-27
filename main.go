@@ -59,6 +59,11 @@ func New(config ...Config) fiber.Handler {
 		}
 		// Rewrite
 		for k, v := range cfg.rulesRegex {
+			non_www := checkNonWWW(k, c.BaseURL()+c.Path())
+			if non_www != "" {
+				return c.Redirect(non_www, cfg.StatusCode)
+			}
+
 			replacer := captureTokens(k, c.Path())
 			if replacer != nil {
 				return c.Redirect(replacer.Replace(v), cfg.StatusCode)
@@ -85,4 +90,12 @@ func captureTokens(pattern *regexp.Regexp, input string) *strings.Replacer {
 		replace[j+1] = v
 	}
 	return strings.NewReplacer(replace...)
+}
+
+// https://github.com/labstack/echo/blob/master/middleware/rewrite.go
+func checkNonWWW(pattern *regexp.Regexp, input string) string {
+	if strings.Contains(input, "www.") {
+		return strings.ReplaceAll(input, "www.", "")
+	}
+	return ""
 }
