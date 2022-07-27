@@ -1,4 +1,4 @@
-module github.com/gofiber/redirect/v2
+module github.com/KakashiHatake324/gofiber-redirect
 
 go 1.14
 
